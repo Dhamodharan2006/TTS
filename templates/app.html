@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Extractor and TTS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{url_for('static',filename='app.css')}}">
+    <script>
+        // Show the loading spinner
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        // Redirect to the scanner page
+        function redirect() {
+            window.location.href = "/scanner";
+        }
+
+        // Populate the captured image preview and hidden input with localStorage data
+        window.onload = function() {
+            const img_data = localStorage.getItem("captured");
+            if (img_data) {
+                document.getElementById("image-preview").src = img_data;
+                document.getElementById("new").value = img_data;
+                document.getElementById("captured-image-container").style.display = 'block';
+                
+            }
+        };
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Text & Speech App</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Upload File Section -->
+            <div class="col-md-6">
+                <h3>Upload an Image or Use Captured Image</h3>
+                <form method="POST" action="/" enctype="multipart/form-data" onsubmit="showLoading()">
+                    <div class="mb-3">
+                        <label for="file-input" class="form-label">Choose a file:</label>
+                        <input type="file" id="file-input" name="file" class="form-control" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <select name="language" class="form-select" required>
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="ta">Tamil</option>
+                        </select>
+                    </div>
+                    <input id="new" name="capturedImage" value="" type="hidden">
+                    <button type="submit" class="btn btn-primary">Convert</button>
+                </form>
+                <div id="loading" class="mt-3" style="display: none;">Processing... <span class="spinner-border spinner-border-sm"></span></div>
+                {% if ext_text %}
+                    <div class="mt-3">
+                        <h5>Extracted Text:</h5>
+                        <p>{{ ext_text }}</p>
+                        <h5>Generated Audio:</h5>
+                        <audio controls>
+                            <source src="{{ audio_file_url }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Display Captured Image Section -->
+            <div class="col-md-6 text-center">
+                <h3>Captured Image Preview</h3>
+                <div id="captured-image-container" style="display: none;">
+                    <img id="image-preview" src="" alt="Captured Image" class="img-fluid mt-3">
+                </div>
+                <h3 class="mt-4">Scan Using Camera</h3>
+                <button class="btn btn-primary" onclick="redirect()">Scan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
